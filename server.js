@@ -7,9 +7,16 @@ const PORT = process.env.PORT || 3000;
 const server = http.createServer((req, res) => {
     const { pathname, query } = url.parse(req.url, true);
 
-    if (pathname === '/') {  
+    if (pathname === '/COMP4537/labs/3/getDate') {
         const name = query.name || 'Guest';
         res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(utils.getDate(name));
+        return;
+    }
+
+    if (pathname === '/') {
+        const name = query.name || 'Guest';
+        res.writeHead(302, { 'Content-Type': 'text/html' });
         res.end(utils.getDate(name));
         return;
     }
