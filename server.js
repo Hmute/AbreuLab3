@@ -16,8 +16,10 @@ const server = http.createServer((req, res) => {
 
     if (pathname === '/') {
         const name = query.name || 'Guest';
-        res.writeHead(302, { 'Content-Type': 'text/html' });
-        res.end(utils.getDate(name));
+        res.writeHead(302, {
+            'Location': `/COMP4537/labs/3/getDate/?name=${encodeURIComponent(name)}`
+        });
+        res.end();
         return;
     }
 
@@ -26,5 +28,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}/`);
+    console.log(`Server running on port ${PORT}`);
 });
