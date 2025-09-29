@@ -5,16 +5,17 @@ const utils = require('./modules/utils');
 const PORT = process.env.PORT || 3000;
 
 const server = http.createServer((req, res) => {
-    const parsedUrl = url.parse(req.url, true);
+    const { pathname, query } = url.parse(req.url, true);
 
-    if (parsedUrl.pathname === "/COMP4537/labs/3/getDate") {
-        const name = parsedUrl.query.name || "Guest";
-        res.writeHead(200, { "Content-Type": "text/html" });
+    if (pathname === '/') {  
+        const name = query.name || 'Guest';
+        res.writeHead(200, { 'Content-Type': 'text/html' });
         res.end(utils.getDate(name));
-    } else {
-        res.writeHead(404, { "Content-Type": "text/plain" });
-        res.end("Not Found");
+        return;
     }
+
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end('Not Found');
 });
 
 server.listen(PORT, () => {
