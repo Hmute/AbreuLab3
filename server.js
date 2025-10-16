@@ -18,10 +18,22 @@ function safeName(name) {
     return /^[\w.\-]+$/.test(name) ? name : null;
 }
 
+// sanitize text input - remove potentially dangerous characters
+function sanitizeText(text) {
+    if (!text || typeof text !== 'string') return null;
+    // Remove HTML tags, script tags, and other potentially dangerous content
+    return text
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove script tags
+        .replace(/<[^>]*>/g, '') // Remove HTML tags
+        .replace(/[<>'"&]/g, '') // Remove dangerous characters
+        .trim()
+        .substring(0, 1000); 
+}
+
 const server = http.createServer((req, res) => {
     const { pathname, query } = url.parse(req.url, true);
 
-    // ---- Part B (your original working routes) ----
+    // ----  working routes ----
     if (pathname === '/COMP4537/labs/3/getDate' || pathname === '/COMP4537/labs/3/getDate/') {
         const name = query.name || 'Guest';
         res.writeHead(200, { 'Content-Type': 'text/html' });
@@ -46,15 +58,22 @@ const server = http.createServer((req, res) => {
             return;
         }
 
+        const sanitizedText = sanitizeText(text);
+        if (!sanitizedText) {
+            res.writeHead(400, { 'Content-Type': 'text/plain' });
+            res.end('Error: Invalid text content');
+            return;
+        }
+
         const filePath = path.join(__dirname, 'file.txt');
-        fs.appendFile(filePath, text + '\n', 'utf8', (err) => {
+        fs.appendFile(filePath, sanitizedText + '\n', 'utf8', (err) => {
             if (err) {
                 res.writeHead(500, { 'Content-Type': 'text/plain' });
                 res.end('Server error: could not write to file');
                 return;
             }
             res.writeHead(200, { 'Content-Type': 'text/plain' });
-            res.end(`Appended "${text}" to file.txt`);
+            res.end(`Appended "${sanitizedText}" to file.txt`);
         });
         return;
     }
